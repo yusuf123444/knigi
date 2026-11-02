@@ -1,0 +1,1054 @@
+<!DOCTYPE html>
+<html lang="ru" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Читальный Уголок — Мир Любимых Книг</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Inter:wght@300;400;500;600;700&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        amber: {
+                            50: '#fffbeb',
+                            100: '#fef3c7',
+                            800: '#92400e',
+                            900: '#78350f',
+                        },
+                        warm: {
+                            bg: '#FAF7F2',
+                            card: '#FFFFFF',
+                            accent: '#C86D51',
+                            accentHover: '#B0593F',
+                            text: '#2D2B2A',
+                            muted: '#7A7571',
+                            border: '#E8E2D9',
+                            darkBg: '#181615',
+                            darkCard: '#242120',
+                            darkBorder: '#383432'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        serif: ['Lora', 'serif'],
+                        display: ['Cinzel', 'serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: rgba(0,0,0,0.05);
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: rgba(200,109,81,0.4);
+            border-radius: 10px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: rgba(200,109,81,0.8);
+        }
+        .book-shadow {
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+        }
+        .book-card-hover {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .book-card-hover:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 30px -10px rgba(200, 109, 81, 0.25);
+        }
+    </style>
+</head>
+<body class="bg-warm-bg dark:bg-warm-darkBg text-warm-text dark:text-gray-100 font-sans transition-colors duration-300 min-h-screen flex flex-col antialiased">
+
+    <!-- NAVIGATION HEADER -->
+    <header class="sticky top-0 z-40 backdrop-blur-md bg-warm-bg/90 dark:bg-warm-darkBg/90 border-b border-warm-border dark:border-warm-darkBorder transition-colors">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-4">
+            <!-- Logo -->
+            <a href="#" class="flex items-center gap-3 group">
+                <div class="w-10 h-10 rounded-xl bg-warm-accent flex items-center justify-center text-white shadow-md group-hover:scale-105 transition-transform">
+                    <i data-lucide="book-open" class="w-6 h-6"></i>
+                </div>
+                <div>
+                    <span class="font-serif text-2xl font-bold tracking-tight block leading-tight">БукЛайн</span>
+                    <span class="text-xs text-warm-muted font-light hidden sm:block">Вселенная литературы</span>
+                </div>
+            </a>
+
+            <!-- Search Bar in Header -->
+            <div class="flex-1 max-w-md mx-4 hidden md:block">
+                <div class="relative">
+                    <i data-lucide="search" class="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-warm-muted"></i>
+                    <input type="text" id="headerSearchInput" placeholder="Поиск по названию, автору или тегу..." 
+                        class="w-full pl-10 pr-4 py-2 text-sm rounded-full bg-white dark:bg-warm-darkCard border border-warm-border dark:border-warm-darkBorder focus:outline-none focus:ring-2 focus:ring-warm-accent/50 focus:border-warm-accent transition-all">
+                </div>
+            </div>
+
+            <!-- Header Actions -->
+            <div class="flex items-center gap-2 sm:gap-4">
+                <nav class="hidden lg:flex items-center gap-6 text-sm font-medium">
+                    <a href="#catalog" class="hover:text-warm-accent transition-colors">Каталог</a>
+                    <a href="#tracker" class="hover:text-warm-accent transition-colors">Трекер чтения</a>
+                    <a href="#quotes" class="hover:text-warm-accent transition-colors">Цитаты</a>
+                </nav>
+
+                <button id="themeToggleBtn" aria-label="Сменить тему" class="p-2.5 rounded-full hover:bg-black/5 dark:hover:bg-white/10 text-warm-muted hover:text-warm-text dark:hover:text-white transition-colors">
+                    <i data-lucide="sun" class="w-5 h-5 hidden dark:block"></i>
+                    <i data-lucide="moon" class="w-5 h-5 block dark:hidden"></i>
+                </button>
+
+                <button id="wishlistToggleBtn" class="relative p-2.5 rounded-full hover:bg-black/5 dark:hover:bg-white/10 text-warm-muted hover:text-warm-accent transition-colors" title="Избранное">
+                    <i data-lucide="bookmark" class="w-5 h-5"></i>
+                    <span id="wishlistBadge" class="hidden absolute top-1 right-1 w-4 h-4 bg-warm-accent text-white text-[10px] font-bold rounded-full flex items-center justify-center">0</span>
+                </button>
+
+                <button id="mobileMenuBtn" class="p-2.5 lg:hidden rounded-lg hover:bg-black/5 dark:hover:bg-white/10">
+                    <i data-lucide="menu" class="w-6 h-6"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Mobile Search Bar (under header for small screens) -->
+        <div class="px-4 pb-3 md:hidden">
+            <div class="relative">
+                <i data-lucide="search" class="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-warm-muted"></i>
+                <input type="text" id="mobileSearchInput" placeholder="Поиск книг или авторов..." 
+                    class="w-full pl-10 pr-4 py-2 text-sm rounded-full bg-white dark:bg-warm-darkCard border border-warm-border dark:border-warm-darkBorder focus:outline-none focus:ring-2 focus:ring-warm-accent/50">
+            </div>
+        </div>
+    </header>
+
+    <!-- MOBILE MENU DROPDOWN -->
+    <div id="mobileMenu" class="hidden lg:hidden bg-warm-card dark:bg-warm-darkCard border-b border-warm-border dark:border-warm-darkBorder px-6 py-4 space-y-3">
+        <a href="#catalog" class="block font-medium hover:text-warm-accent py-1">Каталог книг</a>
+        <a href="#tracker" class="block font-medium hover:text-warm-accent py-1">Трекер чтения</a>
+        <a href="#quotes" class="block font-medium hover:text-warm-accent py-1">Цитата дня</a>
+    </div>
+
+    <main class="flex-grow">
+        <!-- HERO SECTION -->
+        <section class="relative py-12 md:py-20 overflow-hidden bg-gradient-to-b from-amber-50/50 to-transparent dark:from-warm-darkCard/40">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+                    
+                    <div class="lg:col-span-7 space-y-6 text-center lg:text-left">
+                        <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-warm-accent/10 border border-warm-accent/20 text-warm-accent text-xs font-semibold uppercase tracking-wider">
+                            <i data-lucide="sparkles" class="w-3.5 h-3.5"></i> Уютная онлайн-библиотека
+                        </div>
+                        
+                        <h1 class="font-serif text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-warm-text dark:text-white leading-[1.15]">
+                            Откройте для себя новые <span class="italic text-warm-accent font-normal">миры</span> и истории
+                        </h1>
+                        
+                        <p class="text-base sm:text-lg text-warm-muted dark:text-gray-300 max-w-2xl mx-auto lg:mx-0 leading-relaxed">
+                            Исследуйте персональные подборки книг, отслеживайте свой прогресс чтения, находите рецензии и сохраняйте любимые произведения в одном удобном месте.
+                        </p>
+
+                        <div class="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 pt-2">
+                            <a href="#catalog" class="w-full sm:w-auto px-8 py-3.5 rounded-xl bg-warm-accent text-white font-medium hover:bg-warm-accentHover shadow-lg shadow-warm-accent/25 transition-all flex items-center justify-center gap-2">
+                                <span>Перейти к книгам</span>
+                                <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                            </a>
+                            <a href="#tracker" class="w-full sm:w-auto px-8 py-3.5 rounded-xl bg-white dark:bg-warm-darkCard border border-warm-border dark:border-warm-darkBorder font-medium hover:bg-gray-50 dark:hover:bg-warm-darkBorder transition-all flex items-center justify-center gap-2">
+                                <i data-lucide="target" class="w-4 h-4 text-warm-accent"></i>
+                                <span>Мои цели чтения</span>
+                            </a>
+                        </div>
+
+                        <!-- Stats Banner -->
+                        <div class="pt-6 border-t border-warm-border/60 dark:border-warm-darkBorder/60 grid grid-cols-3 gap-4 max-w-md mx-auto lg:mx-0">
+                            <div>
+                                <span class="block font-serif text-2xl font-bold text-warm-text dark:text-white">1,200+</span>
+                                <span class="text-xs text-warm-muted">В каталоге</span>
+                            </div>
+                            <div>
+                                <span class="block font-serif text-2xl font-bold text-warm-text dark:text-white">4.8 / 5</span>
+                                <span class="text-xs text-warm-muted">Средняя оценка</span>
+                            </div>
+                            <div>
+                                <span class="block font-serif text-2xl font-bold text-warm-text dark:text-white">100%</span>
+                                <span class="text-xs text-warm-muted">Вдохновения</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Hero Visual / Books Preview Stack -->
+                    <div class="lg:col-span-5 relative flex justify-center">
+                        <div class="relative w-72 sm:w-80 h-96 sm:h-[420px]">
+                            <!-- Decorative background blur -->
+                            <div class="absolute inset-0 bg-warm-accent/20 rounded-full blur-3xl -z-10"></div>
+                            
+                            <!-- Card 1 (Back) -->
+                            <div class="absolute top-4 -left-6 w-56 h-80 rounded-xl bg-amber-800 shadow-xl transform -rotate-12 opacity-80 overflow-hidden border border-amber-700/50 hidden sm:block">
+                                <img src="https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&q=80&w=400" alt="Книга 1" class="w-full h-full object-cover">
+                            </div>
+
+                            <!-- Card 2 (Middle) -->
+                            <div class="absolute top-2 -right-4 w-56 h-80 rounded-xl bg-blue-900 shadow-xl transform rotate-6 opacity-90 overflow-hidden border border-blue-800/50">
+                                <img src="https://images.unsplash.com/photo-1543002588-bfa74002ed7e?auto=format&fit=crop&q=80&w=400" alt="Книга 2" class="w-full h-full object-cover">
+                            </div>
+
+                            <!-- Card 3 (Featured Front) -->
+                            <div class="absolute top-0 left-4 w-60 sm:w-64 h-88 sm:h-96 rounded-xl bg-slate-900 shadow-2xl transform hover:scale-105 transition-transform duration-300 overflow-hidden border-2 border-white/20 flex flex-col justify-end p-5">
+                                <img src="https://images.unsplash.com/photo-1512820790803-83ca734da794?auto=format&fit=crop&q=80&w=500" alt="Главная книга" class="absolute inset-0 w-full h-full object-cover">
+                                <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent"></div>
+                                <div class="relative z-10 text-white">
+                                    <span class="text-xs bg-warm-accent px-2 py-0.5 rounded text-white font-medium">Бестселлер</span>
+                                    <h3 class="font-serif font-bold text-lg mt-1">Мастер и Маргарита</h3>
+                                    <p class="text-xs text-gray-300">Михаил Булгаков</p>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- FEATURED / CATALOG SECTION -->
+        <section id="catalog" class="py-12 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            
+            <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8">
+                <div>
+                    <h2 class="font-serif text-3xl font-bold tracking-tight">Каталог Произведений</h2>
+                    <p class="text-warm-muted dark:text-gray-400 mt-1">Выберите жанр или воспользуйтесь поиском для выбора идеальной книги</p>
+                </div>
+
+                <!-- Genre Filters -->
+                <div class="flex items-center gap-2 overflow-x-auto pb-2 md:pb-0 custom-scrollbar" id="categoryFilters">
+                    <!-- Dynamic Buttons Generated via JS -->
+                </div>
+            </div>
+
+            <!-- Active Search Filter Summary & Sort options -->
+            <div class="flex flex-wrap items-center justify-between gap-4 mb-6 bg-white dark:bg-warm-darkCard p-4 rounded-xl border border-warm-border dark:border-warm-darkBorder">
+                <div class="text-sm text-warm-muted" id="searchResultSummary">
+                    Показано книг: <span id="displayedCount" class="font-semibold text-warm-text dark:text-white">0</span>
+                </div>
+
+                <div class="flex items-center gap-3">
+                    <label for="sortBy" class="text-xs font-medium text-warm-muted uppercase tracking-wider">Сортировка:</label>
+                    <select id="sortBy" class="bg-warm-bg dark:bg-warm-darkBg border border-warm-border dark:border-warm-darkBorder text-sm rounded-lg px-3 py-1.5 focus:outline-none focus:ring-1 focus:ring-warm-accent">
+                        <option value="rating">По рейтингу (высокий)</option>
+                        <option value="popular">По популярности</option>
+                        <option value="title">По названию (А-Я)</option>
+                        <option value="pages">По объёму (страницы)</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Book Grid -->
+            <div id="booksGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                <!-- Book Cards rendered here via JavaScript -->
+            </div>
+
+            <!-- Empty State -->
+            <div id="emptyState" class="hidden text-center py-16 bg-white dark:bg-warm-darkCard rounded-2xl border border-dashed border-warm-border dark:border-warm-darkBorder my-6">
+                <i data-lucide="book-open-check" class="w-16 h-16 mx-auto text-warm-muted mb-4 opacity-50"></i>
+                <h3 class="font-serif text-xl font-bold mb-1">Ничего не найдено</h3>
+                <p class="text-warm-muted text-sm max-w-md mx-auto mb-6">К сожалению, по вашему запросу книг не найдено. Попробуйте изменить фильтры или поисковое слово.</p>
+                <button id="resetFiltersBtn" class="px-5 py-2.5 bg-warm-accent text-white rounded-xl text-sm font-medium hover:bg-warm-accentHover transition-colors">
+                    Сбросить фильтры
+                </button>
+            </div>
+
+        </section>
+
+        <!-- READING TRACKER & GOAL SECTION -->
+        <section id="tracker" class="py-12 bg-white dark:bg-warm-darkCard border-y border-warm-border dark:border-warm-darkBorder">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+                    
+                    <div class="lg:col-span-5 space-y-4">
+                        <div class="inline-flex items-center gap-2 text-warm-accent text-xs font-semibold uppercase tracking-wider">
+                            <i data-lucide="award" class="w-4 h-4"></i> Личный трекер
+                        </div>
+                        <h2 class="font-serif text-3xl font-bold">Ваша цель чтения на этот год</h2>
+                        <p class="text-warm-muted dark:text-gray-300 text-sm leading-relaxed">
+                            Установка целей помогает читать регулярно и открывать новые горизонты. Отмечайте прочитанные книги и отслеживайте прогресс в реальном времени.
+                        </p>
+
+                        <!-- Goal Settings Mini Form -->
+                        <div class="pt-2 flex items-center gap-3">
+                            <label for="goalInput" class="text-xs font-medium text-warm-muted">Изменить цель (книг):</label>
+                            <input type="number" id="goalInput" min="1" max="100" value="12" class="w-20 px-3 py-1.5 border border-warm-border dark:border-warm-darkBorder rounded-lg bg-warm-bg dark:bg-warm-darkBg text-center font-bold text-sm">
+                            <button id="updateGoalBtn" class="px-4 py-1.5 bg-warm-accent text-white text-xs font-medium rounded-lg hover:bg-warm-accentHover transition-colors">Сохранить</button>
+                        </div>
+                    </div>
+
+                    <div class="lg:col-span-7 bg-warm-bg dark:bg-warm-darkBg p-6 sm:p-8 rounded-2xl border border-warm-border dark:border-warm-darkBorder shadow-sm">
+                        
+                        <div class="flex justify-between items-end mb-3">
+                            <div>
+                                <span class="text-xs text-warm-muted uppercase tracking-wider font-semibold block">Прогресс за 2026 год</span>
+                                <span class="font-serif text-3xl font-bold"><span id="readCount">0</span> из <span id="goalTarget">12</span> книг</span>
+                            </div>
+                            <span id="goalPercentage" class="text-2xl font-bold text-warm-accent">0%</span>
+                        </div>
+
+                        <!-- Progress Bar -->
+                        <div class="w-full h-4 bg-gray-200 dark:bg-warm-darkBorder rounded-full overflow-hidden mb-6 p-0.5">
+                            <div id="progressBar" class="h-full bg-gradient-to-r from-warm-accent to-amber-500 rounded-full transition-all duration-500" style="width: 0%"></div>
+                        </div>
+
+                        <!-- User Read List Preview / Quick Stats -->
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 border-t border-warm-border dark:border-warm-darkBorder pt-6">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-lg bg-emerald-100 dark:bg-emerald-900/40 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
+                                    <i data-lucide="check-circle-2" class="w-5 h-5"></i>
+                                </div>
+                                <div>
+                                    <div class="text-xs text-warm-muted">Прочитано</div>
+                                    <div class="font-semibold text-sm" id="statReadCount">0 книг</div>
+                                </div>
+                            </div>
+
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-lg bg-amber-100 dark:bg-amber-900/40 text-amber-600 dark:text-amber-400 flex items-center justify-center">
+                                    <i data-lucide="bookmark" class="w-5 h-5"></i>
+                                </div>
+                                <div>
+                                    <div class="text-xs text-warm-muted">В избранном</div>
+                                    <div class="font-semibold text-sm" id="statWishlistCount">0 книг</div>
+                                </div>
+                            </div>
+
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400 flex items-center justify-center">
+                                    <i data-lucide="file-text" class="w-5 h-5"></i>
+                                </div>
+                                <div>
+                                    <div class="text-xs text-warm-muted">Всего страниц</div>
+                                    <div class="font-semibold text-sm" id="statTotalPages">0 стр.</div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- DAILY QUOTE SECTION -->
+        <section id="quotes" class="py-16 max-w-5xl mx-auto px-4 text-center">
+            <div class="bg-gradient-to-r from-amber-100/50 via-warm-bg to-amber-100/50 dark:from-warm-darkCard dark:via-warm-darkBg dark:to-warm-darkCard p-8 sm:p-12 rounded-3xl border border-warm-border dark:border-warm-darkBorder relative overflow-hidden">
+                <i data-lucide="quote" class="w-20 h-20 absolute -top-4 -left-4 text-warm-accent/10"></i>
+                
+                <span class="text-xs font-semibold uppercase tracking-widest text-warm-accent mb-3 block">Цитата для вдохновения</span>
+                
+                <blockquote id="quoteText" class="font-serif text-xl sm:text-2xl md:text-3xl italic font-medium leading-relaxed max-w-3xl mx-auto text-warm-text dark:text-white">
+                    «Книги — это уникальная переносная магия.»
+                </blockquote>
+                
+                <p id="quoteAuthor" class="mt-4 font-semibold text-sm text-warm-muted">— Стивен Кинг</p>
+
+                <button id="nextQuoteBtn" class="mt-6 inline-flex items-center gap-2 text-xs font-medium text-warm-accent hover:underline">
+                    <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> Показать другую цитату
+                </button>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-white dark:bg-warm-darkCard border-t border-warm-border dark:border-warm-darkBorder py-12 mt-auto">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+                <div class="md:col-span-2 space-y-3">
+                    <div class="flex items-center gap-2">
+                        <div class="w-8 h-8 rounded-lg bg-warm-accent flex items-center justify-center text-white">
+                            <i data-lucide="book-open" class="w-5 h-5"></i>
+                        </div>
+                        <span class="font-serif text-xl font-bold">БукЛайн</span>
+                    </div>
+                    <p class="text-warm-muted dark:text-gray-400 text-sm max-w-sm">
+                        Ваш уютный цифровой угол для поиска литературных сокровищ, сохранения любимых авторов и отслеживания читательских успехов.
+                    </p>
+                </div>
+
+                <div>
+                    <h4 class="font-bold text-sm mb-3">Навигация</h4>
+                    <ul class="space-y-2 text-sm text-warm-muted">
+                        <li><a href="#catalog" class="hover:text-warm-accent transition-colors">Каталог книг</a></li>
+                        <li><a href="#tracker" class="hover:text-warm-accent transition-colors">Трекер чтения</a></li>
+                        <li><a href="#quotes" class="hover:text-warm-accent transition-colors">Цитаты</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h4 class="font-bold text-sm mb-3">Жанры</h4>
+                    <ul class="space-y-2 text-sm text-warm-muted">
+                        <li><a href="#catalog" onclick="filterByCategory('Фантастика')" class="hover:text-warm-accent transition-colors">Фантастика</a></li>
+                        <li><a href="#catalog" onclick="filterByCategory('Классика')" class="hover:text-warm-accent transition-colors">Классика</a></li>
+                        <li><a href="#catalog" onclick="filterByCategory('Детектив')" class="hover:text-warm-accent transition-colors">Детектив</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="pt-8 border-t border-warm-border dark:border-warm-darkBorder flex flex-col sm:flex-row items-center justify-between text-xs text-warm-muted gap-4">
+                <p>© 2026 БукЛайн. Создано для всех, кто любит читать.</p>
+                <div class="flex gap-4">
+                    <a href="#" class="hover:underline">Конфиденциальность</a>
+                    <a href="#" class="hover:underline">Условия использования</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- BOOK DETAIL MODAL -->
+    <div id="bookModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm transition-opacity">
+        <div class="bg-white dark:bg-warm-darkCard w-full max-w-3xl rounded-2xl shadow-2xl overflow-hidden border border-warm-border dark:border-warm-darkBorder max-h-[90vh] flex flex-col relative animate-in fade-in zoom-in-95 duration-200">
+            
+            <!-- Close button -->
+            <button id="closeModalBtn" class="absolute top-4 right-4 z-10 w-9 h-9 rounded-full bg-black/20 hover:bg-black/40 text-white flex items-center justify-center backdrop-blur-md transition-colors">
+                <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+
+            <div class="overflow-y-auto p-6 sm:p-8 custom-scrollbar">
+                <div class="grid grid-cols-1 sm:grid-cols-12 gap-6 sm:gap-8">
+                    
+                    <!-- Cover Image & Quick Actions -->
+                    <div class="sm:col-span-5 flex flex-col items-center">
+                        <div class="w-48 sm:w-full aspect-[2/3] rounded-xl overflow-hidden shadow-lg border border-warm-border dark:border-warm-darkBorder relative group">
+                            <img id="modalCover" src="" alt="Обложка" class="w-full h-full object-cover">
+                        </div>
+
+                        <div class="w-full mt-5 space-y-2">
+                            <button id="modalWishlistBtn" class="w-full py-2.5 px-4 rounded-xl border border-warm-border dark:border-warm-darkBorder flex items-center justify-center gap-2 text-sm font-medium hover:bg-gray-50 dark:hover:bg-warm-darkBorder transition-colors">
+                                <i data-lucide="bookmark" class="w-4 h-4"></i>
+                                <span id="modalWishlistText">В избранное</span>
+                            </button>
+
+                            <button id="modalReadBtn" class="w-full py-2.5 px-4 rounded-xl bg-warm-accent text-white flex items-center justify-center gap-2 text-sm font-medium hover:bg-warm-accentHover transition-colors shadow-md shadow-warm-accent/20">
+                                <i data-lucide="check-circle" class="w-4 h-4"></i>
+                                <span id="modalReadText">Отметить как прочитано</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Book Info -->
+                    <div class="sm:col-span-7 flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center gap-2 mb-2">
+                                <span id="modalGenre" class="text-xs px-2.5 py-0.5 rounded-full bg-warm-accent/10 text-warm-accent font-semibold">Жанр</span>
+                                <span id="modalYear" class="text-xs text-warm-muted">Год</span>
+                            </div>
+
+                            <h2 id="modalTitle" class="font-serif text-2xl sm:text-3xl font-bold leading-tight text-warm-text dark:text-white">Название Книги</h2>
+                            <p id="modalAuthor" class="text-warm-accent font-medium text-base mt-1 mb-3">Автор</p>
+
+                            <!-- Rating & Pages -->
+                            <div class="flex items-center gap-4 py-3 border-y border-warm-border dark:border-warm-darkBorder my-4 text-sm">
+                                <div class="flex items-center gap-1">
+                                    <i data-lucide="star" class="w-4 h-4 fill-amber-400 text-amber-400"></i>
+                                    <span id="modalRating" class="font-bold">4.8</span>
+                                    <span class="text-warm-muted text-xs">(оценки)</span>
+                                </div>
+                                <div class="text-warm-border dark:text-warm-darkBorder">|</div>
+                                <div class="flex items-center gap-1.5 text-warm-muted">
+                                    <i data-lucide="book-open" class="w-4 h-4"></i>
+                                    <span id="modalPages">320 стр.</span>
+                                </div>
+                            </div>
+
+                            <!-- Description -->
+                            <div class="space-y-2">
+                                <h4 class="text-xs font-bold uppercase tracking-wider text-warm-muted">Описание книги</h4>
+                                <p id="modalDescription" class="text-sm leading-relaxed text-warm-text/90 dark:text-gray-300">
+                                    Полное аннотированное описание книги.
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- User Rating Interactive Section -->
+                        <div class="mt-6 pt-4 border-t border-warm-border dark:border-warm-darkBorder">
+                            <h4 class="text-xs font-bold uppercase tracking-wider text-warm-muted mb-2">Ваша оценка</h4>
+                            <div class="flex items-center gap-1" id="starRatingContainer">
+                                <button class="star-btn text-gray-300 hover:text-amber-400 p-1 transition-colors" data-star="1"><i data-lucide="star" class="w-6 h-6"></i></button>
+                                <button class="star-btn text-gray-300 hover:text-amber-400 p-1 transition-colors" data-star="2"><i data-lucide="star" class="w-6 h-6"></i></button>
+                                <button class="star-btn text-gray-300 hover:text-amber-400 p-1 transition-colors" data-star="3"><i data-lucide="star" class="w-6 h-6"></i></button>
+                                <button class="star-btn text-gray-300 hover:text-amber-400 p-1 transition-colors" data-star="4"><i data-lucide="star" class="w-6 h-6"></i></button>
+                                <button class="star-btn text-gray-300 hover:text-amber-400 p-1 transition-colors" data-star="5"><i data-lucide="star" class="w-6 h-6"></i></button>
+                                <span id="userRatingLabel" class="text-xs font-semibold text-warm-muted ml-2">Нажмите, чтобы оценить</span>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- WISHLIST DRAWER / SLIDE-OVER -->
+    <div id="wishlistDrawer" class="fixed inset-0 z-50 hidden">
+        <div id="wishlistOverlay" class="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
+        <div class="absolute right-0 top-0 bottom-0 w-full max-w-md bg-white dark:bg-warm-darkCard shadow-2xl p-6 flex flex-col border-l border-warm-border dark:border-warm-darkBorder">
+            <div class="flex items-center justify-between pb-4 border-b border-warm-border dark:border-warm-darkBorder">
+                <div class="flex items-center gap-2">
+                    <i data-lucide="bookmark" class="w-5 h-5 text-warm-accent"></i>
+                    <h3 class="font-serif text-xl font-bold">Избранные книги</h3>
+                </div>
+                <button id="closeWishlistBtn" class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-warm-darkBorder">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <div id="wishlistContent" class="flex-grow overflow-y-auto py-4 space-y-4 custom-scrollbar">
+                <!-- Wishlist items injected here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- APPLICATION LOGIC & DATA -->
+    <script>
+        // SAMPLE BOOK DATABASE
+        const booksData = [
+            {
+                id: '1',
+                title: 'Мастер и Маргарита',
+                author: 'Михаил Булгаков',
+                category: 'Классика',
+                rating: 4.9,
+                reviewsCount: 1420,
+                year: 1967,
+                pages: 480,
+                cover: 'https://images.unsplash.com/photo-1512820790803-83ca734da794?auto=format&fit=crop&q=80&w=600',
+                description: 'Блистательный шедевр русской литературы XX века. В Москву 30-х годов прибывает загадочный иностранный профессор Воланд со своей свитой. В это же время разворачивается история любви талантливого Мастера и его преданной Маргариты.'
+            },
+            {
+                id: '2',
+                title: 'Дюна',
+                author: 'Фрэнк Герберт',
+                category: 'Фантастика',
+                rating: 4.8,
+                reviewsCount: 2310,
+                year: 1965,
+                pages: 704,
+                cover: 'https://images.unsplash.com/photo-1543002588-bfa74002ed7e?auto=format&fit=crop&q=80&w=600',
+                description: 'Захватывающая эпическая фантастическая сага о песчаной планете Арракис, ценнейшем ресурсе во Вселенной — Пряности, и юном Поле Атрейдесе, которому суждено изменить судьбу империи.'
+            },
+            {
+                id: '3',
+                title: '1984',
+                author: 'Джордж Оруэлл',
+                category: 'Антиутопия',
+                rating: 4.7,
+                reviewsCount: 3100,
+                year: 1949,
+                pages: 320,
+                cover: 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&q=80&w=600',
+                description: 'Классический роман-антиутопия о тоталитарном государстве, где мысли контролируются Старшим Братом, а истина переписывается ежедневно. Уинстон Смит пытается сохранить человечность в мире слежки.'
+            },
+            {
+                id: '4',
+                title: 'Убийство в Восточном экспрессе',
+                author: 'Агата Кристи',
+                category: 'Детектив',
+                rating: 4.6,
+                reviewsCount: 980,
+                year: 1934,
+                pages: 256,
+                cover: 'https://images.unsplash.com/photo-1516979187457-637abb4f9353?auto=format&fit=crop&q=80&w=600',
+                description: 'Знаменитый детектив Эркюль Пуаро путешествует на роскошном поезде. Когда происходит загадочное убийство, поезд оказывается занесен снегом, а подозреваемым становится каждый пассажир.'
+            },
+            {
+                id: '5',
+                title: 'Властелин Колец: Братство Кольца',
+                author: 'Дж. Р. Р. Толкин',
+                category: 'Фэнтези',
+                rating: 4.9,
+                reviewsCount: 4120,
+                year: 1954,
+                pages: 576,
+                cover: 'https://images.unsplash.com/photo-1629992101753-56d196c8aab5?auto=format&fit=crop&q=80&w=600',
+                description: 'Начало великого путешествия юного хоббита Фродо Бэггинса, которому поручено уничтожить Единое Кольцо в пламени Огненной Горы и спасти Средиземье от Тёмного Властелина.'
+            },
+            {
+                id: '6',
+                title: 'Атомные привычки',
+                author: 'Джеймс Клир',
+                category: 'Нон-фикшн',
+                rating: 4.8,
+                reviewsCount: 1850,
+                year: 2018,
+                pages: 304,
+                cover: 'https://images.unsplash.com/photo-1589829085413-56de8ae18c73?auto=format&fit=crop&q=80&w=600',
+                description: 'Проверенное руководство по изменению жизни на 1% каждый день. Практические методики формирования полезных привычек и избавления от вредных через понимание человеческой психологии.'
+            },
+            {
+                id: '7',
+                title: 'Цветы для Элджернона',
+                author: 'Дэниел Киз',
+                category: 'Фантастика',
+                rating: 4.8,
+                reviewsCount: 1650,
+                year: 1966,
+                pages: 320,
+                cover: 'https://images.unsplash.com/photo-1495640388908-05fa85288e61?auto=format&fit=crop&q=80&w=600',
+                description: 'Трогательная история умственно отсталого Чарли Гордона, который участвует в экспериментальной операции по повышению интеллекта, повторив опыт над мышью по имени Элджернон.'
+            },
+            {
+                id: '8',
+                title: 'Шерлок Холмс: Этюд в багровых тонах',
+                author: 'Артур Конан Дойл',
+                category: 'Детектив',
+                rating: 4.7,
+                reviewsCount: 1240,
+                year: 1887,
+                pages: 220,
+                cover: 'https://images.unsplash.com/photo-1476275466078-4007374efbbe?auto=format&fit=crop&q=80&w=600',
+                description: 'Первое произведение о гениальном сыщике Шерлоке Холмсе и его верном друге докторе Ватсоне. Знакомство героев и расследование запутанного преступления в Лондоне.'
+            }
+        ];
+
+        // QUOTES DATABASE
+        const quotesData = [
+            { text: "«Книги — это уникальная переносная магия.»", author: "Стивен Кинг" },
+            { text: "«Человек, который не читает хороших книг, не имеет преимуществ перед человеком, который не умеет читать.»", author: "Марк Твен" },
+            { text: "«Книга — это мечта, которую вы держите в руках.»", author: "Нил Гейман" },
+            { text: "«Читая авторов, которые хорошо пишут, привыкаешь хорошо говорить.»", author: "Вольтер" }
+        ];
+
+        // APP STATE
+        let activeCategory = 'Все';
+        let searchQuery = '';
+        let sortBy = 'rating';
+        let wishlist = JSON.parse(localStorage.getItem('book_wishlist') || '[]');
+        let readBooks = JSON.parse(localStorage.getItem('book_read') || '[]');
+        let readingGoal = parseInt(localStorage.getItem('reading_goal') || '12');
+        let selectedBookId = null;
+        let currentQuoteIndex = 0;
+
+        // INITIALIZATION
+        document.addEventListener('DOMContentLoaded', () => {
+            initLucideIcons();
+            initTheme();
+            renderCategories();
+            renderBooks();
+            updateTrackerStats();
+            setupEventListeners();
+        });
+
+        function initLucideIcons() {
+            if (window.lucide) {
+                lucide.createIcons();
+            }
+        }
+
+        // THEME HANDLING
+        function initTheme() {
+            const isDark = localStorage.getItem('theme') === 'dark' || 
+                (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches);
+            
+            if (isDark) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+        }
+
+        document.getElementById('themeToggleBtn').addEventListener('click', () => {
+            const isDark = document.documentElement.classList.toggle('dark');
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+        });
+
+        // CATEGORIES
+        const categories = ['Все', 'Классика', 'Фантастика', 'Детектив', 'Фэнтези', 'Нон-фикшн', 'Антиутопия'];
+
+        function renderCategories() {
+            const container = document.getElementById('categoryFilters');
+            container.innerHTML = categories.map(cat => `
+                <button 
+                    onclick="filterByCategory('${cat}')"
+                    class="px-4 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all ${
+                        activeCategory === cat 
+                        ? 'bg-warm-accent text-white shadow-md shadow-warm-accent/20' 
+                        : 'bg-white dark:bg-warm-darkCard text-warm-text dark:text-gray-300 border border-warm-border dark:border-warm-darkBorder hover:border-warm-accent'
+                    }">
+                    ${cat}
+                </button>
+            `).join('');
+        }
+
+        function filterByCategory(category) {
+            activeCategory = category;
+            renderCategories();
+            renderBooks();
+        }
+
+        // RENDER BOOKS
+        function renderBooks() {
+            const grid = document.getElementById('booksGrid');
+            const emptyState = document.getElementById('emptyState');
+
+            // Filter
+            let filtered = booksData.filter(book => {
+                const matchesCategory = activeCategory === 'Все' || book.category === activeCategory;
+                const matchesSearch = book.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                                      book.author.toLowerCase().includes(searchQuery.toLowerCase());
+                return matchesCategory && matchesSearch;
+            });
+
+            // Sort
+            filtered.sort((a, b) => {
+                if (sortBy === 'rating') return b.rating - a.rating;
+                if (sortBy === 'popular') return b.reviewsCount - a.reviewsCount;
+                if (sortBy === 'title') return a.title.localeCompare(b.title);
+                if (sortBy === 'pages') return b.pages - a.pages;
+                return 0;
+            });
+
+            // Update Counts
+            document.getElementById('displayedCount').textContent = filtered.length;
+
+            if (filtered.length === 0) {
+                grid.innerHTML = '';
+                emptyState.classList.remove('hidden');
+                return;
+            } else {
+                emptyState.classList.add('hidden');
+            }
+
+            grid.innerHTML = filtered.map(book => {
+                const isWishlisted = wishlist.includes(book.id);
+                const isRead = readBooks.includes(book.id);
+
+                return `
+                <div class="bg-white dark:bg-warm-darkCard rounded-2xl border border-warm-border dark:border-warm-darkBorder overflow-hidden book-card-hover flex flex-col justify-between p-4 group">
+                    <div>
+                        <!-- Book Cover Image -->
+                        <div class="relative aspect-[2/3] rounded-xl overflow-hidden mb-4 bg-gray-100 dark:bg-warm-darkBg">
+                            <img src="${book.cover}" alt="${book.title}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                            
+                            <!-- Badges -->
+                            <div class="absolute top-2 left-2 flex flex-col gap-1">
+                                <span class="bg-white/90 dark:bg-warm-darkCard/90 backdrop-blur-md text-[10px] font-bold px-2 py-0.5 rounded-md text-warm-text dark:text-white border border-warm-border/50">
+                                    ${book.category}
+                                </span>
+                            </div>
+
+                            <!-- Read Indicator Badge -->
+                            ${isRead ? `
+                                <div class="absolute top-2 right-2 bg-emerald-500 text-white p-1.5 rounded-full shadow-lg" title="Прочитано">
+                                    <i data-lucide="check" class="w-3.5 h-3.5"></i>
+                                </div>
+                            ` : ''}
+
+                            <!-- Action Overlay -->
+                            <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2 p-2 backdrop-blur-[2px]">
+                                <button onclick="openBookModal('${book.id}')" class="px-3 py-2 bg-white text-warm-text text-xs font-semibold rounded-lg hover:bg-warm-accent hover:text-white transition-colors shadow-md">
+                                    Подробнее
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Book Info -->
+                        <div class="flex items-center justify-between gap-1 text-xs text-warm-muted mb-1">
+                            <span>${book.author}</span>
+                            <div class="flex items-center gap-1 text-amber-500 font-semibold">
+                                <i data-lucide="star" class="w-3.5 h-3.5 fill-amber-400"></i>
+                                <span>${book.rating}</span>
+                            </div>
+                        </div>
+
+                        <h3 onclick="openBookModal('${book.id}')" class="font-serif font-bold text-base hover:text-warm-accent transition-colors cursor-pointer line-clamp-1 text-warm-text dark:text-white">
+                            ${book.title}
+                        </h3>
+                    </div>
+
+                    <!-- Card Footer Actions -->
+                    <div class="mt-4 pt-3 border-t border-warm-border/60 dark:border-warm-darkBorder/60 flex items-center justify-between">
+                        <span class="text-xs text-warm-muted">${book.pages} страниц</span>
+                        
+                        <button onclick="toggleWishlist('${book.id}', event)" class="p-1.5 rounded-lg hover:bg-warm-bg dark:hover:bg-warm-darkBorder transition-colors ${isWishlisted ? 'text-warm-accent' : 'text-warm-muted'}">
+                            <i data-lucide="bookmark" class="w-4 h-4 ${isWishlisted ? 'fill-warm-accent' : ''}"></i>
+                        </button>
+                    </div>
+                </div>
+                `;
+            }).join('');
+
+            initLucideIcons();
+        }
+
+        // EVENT LISTENERS FOR SEARCH & FILTERS
+        function setupEventListeners() {
+            // Search input listeners
+            const headerSearch = document.getElementById('headerSearchInput');
+            const mobileSearch = document.getElementById('mobileSearchInput');
+
+            const handleSearch = (e) => {
+                searchQuery = e.target.value;
+                if (e.target === headerSearch) mobileSearch.value = searchQuery;
+                else headerSearch.value = searchQuery;
+                renderBooks();
+            };
+
+            headerSearch.addEventListener('input', handleSearch);
+            mobileSearch.addEventListener('input', handleSearch);
+
+            // Sort Selector
+            document.getElementById('sortBy').addEventListener('change', (e) => {
+                sortBy = e.target.value;
+                renderBooks();
+            });
+
+            // Reset filters
+            document.getElementById('resetFiltersBtn').addEventListener('click', () => {
+                searchQuery = '';
+                activeCategory = 'Все';
+                headerSearch.value = '';
+                mobileSearch.value = '';
+                renderCategories();
+                renderBooks();
+            });
+
+            // Reading Goal Updates
+            document.getElementById('updateGoalBtn').addEventListener('click', () => {
+                const newGoal = parseInt(document.getElementById('goalInput').value);
+                if (newGoal && newGoal > 0) {
+                    readingGoal = newGoal;
+                    localStorage.setItem('reading_goal', readingGoal.toString());
+                    updateTrackerStats();
+                }
+            });
+
+            // Modal Controls
+            document.getElementById('closeModalBtn').addEventListener('click', closeModal);
+            document.getElementById('bookModal').addEventListener('click', (e) => {
+                if (e.target.id === 'bookModal') closeModal();
+            });
+
+            // Modal Action Buttons
+            document.getElementById('modalWishlistBtn').addEventListener('click', () => {
+                if (selectedBookId) {
+                    toggleWishlist(selectedBookId);
+                    updateModalState();
+                }
+            });
+
+            document.getElementById('modalReadBtn').addEventListener('click', () => {
+                if (selectedBookId) {
+                    toggleReadStatus(selectedBookId);
+                    updateModalState();
+                }
+            });
+
+            // Star Rating Buttons inside modal
+            document.querySelectorAll('.star-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const starVal = parseInt(btn.getAttribute('data-star'));
+                    highlightStars(starVal);
+                    document.getElementById('userRatingLabel').textContent = `Ваша оценка: ${starVal} из 5`;
+                });
+            });
+
+            // Wishlist Drawer Controls
+            document.getElementById('wishlistToggleBtn').addEventListener('click', openWishlistDrawer);
+            document.getElementById('closeWishlistBtn').addEventListener('click', closeWishlistDrawer);
+            document.getElementById('wishlistOverlay').addEventListener('click', closeWishlistDrawer);
+
+            // Mobile Menu
+            document.getElementById('mobileMenuBtn').addEventListener('click', () => {
+                const menu = document.getElementById('mobileMenu');
+                menu.classList.toggle('hidden');
+            });
+
+            // Quotes Rotator
+            document.getElementById('nextQuoteBtn').addEventListener('click', () => {
+                currentQuoteIndex = (currentQuoteIndex + 1) % quotesData.length;
+                document.getElementById('quoteText').textContent = quotesData[currentQuoteIndex].text;
+                document.getElementById('quoteAuthor').textContent = `— ${quotesData[currentQuoteIndex].author}`;
+            });
+        }
+
+        // WISHLIST MANAGEMENT
+        function toggleWishlist(id, event) {
+            if (event) event.stopPropagation();
+            
+            const index = wishlist.indexOf(id);
+            if (index > -1) {
+                wishlist.splice(index, 1);
+            } else {
+                wishlist.push(id);
+            }
+            
+            localStorage.setItem('book_wishlist', JSON.stringify(wishlist));
+            updateWishlistBadge();
+            renderBooks();
+            renderWishlistItems();
+        }
+
+        function updateWishlistBadge() {
+            const badge = document.getElementById('wishlistBadge');
+            if (wishlist.length > 0) {
+                badge.textContent = wishlist.length;
+                badge.classList.remove('hidden');
+            } else {
+                badge.classList.add('hidden');
+            }
+            document.getElementById('statWishlistCount').textContent = `${wishlist.length} книг`;
+        }
+
+        function openWishlistDrawer() {
+            renderWishlistItems();
+            document.getElementById('wishlistDrawer').classList.remove('hidden');
+        }
+
+        function closeWishlistDrawer() {
+            document.getElementById('wishlistDrawer').classList.add('hidden');
+        }
+
+        function renderWishlistItems() {
+            const container = document.getElementById('wishlistContent');
+            const items = booksData.filter(b => wishlist.includes(b.id));
+
+            if (items.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-12 text-warm-muted">
+                        <i data-lucide="bookmark-x" class="w-12 h-12 mx-auto mb-3 opacity-40"></i>
+                        <p class="text-sm">Список избранного пуст</p>
+                    </div>
+                `;
+                initLucideIcons();
+                return;
+            }
+
+            container.innerHTML = items.map(book => `
+                <div class="flex gap-4 p-3 rounded-xl bg-warm-bg dark:bg-warm-darkBg border border-warm-border dark:border-warm-darkBorder items-center">
+                    <img src="${book.cover}" alt="${book.title}" class="w-14 h-20 object-cover rounded-lg">
+                    <div class="flex-1 min-w-0">
+                        <h4 class="font-serif font-bold text-sm truncate">${book.title}</h4>
+                        <p class="text-xs text-warm-muted truncate">${book.author}</p>
+                        <span class="inline-block mt-1 text-[10px] font-semibold text-warm-accent">${book.category}</span>
+                    </div>
+                    <button onclick="toggleWishlist('${book.id}')" class="p-2 text-warm-muted hover:text-red-500">
+                        <i data-lucide="trash-2" class="w-4 h-4"></i>
+                    </button>
+                </div>
+            `).join('');
+
+            initLucideIcons();
+        }
+
+        // READ STATUS & TRACKER
+        function toggleReadStatus(id) {
+            const index = readBooks.indexOf(id);
+            if (index > -1) {
+                readBooks.splice(index, 1);
+            } else {
+                readBooks.push(id);
+            }
+            localStorage.setItem('book_read', JSON.stringify(readBooks));
+            updateTrackerStats();
+            renderBooks();
+        }
+
+        function updateTrackerStats() {
+            const readCount = readBooks.length;
+            document.getElementById('readCount').textContent = readCount;
+            document.getElementById('goalTarget').textContent = readingGoal;
+            document.getElementById('goalInput').value = readingGoal;
+
+            const percentage = Math.min(Math.round((readCount / readingGoal) * 100), 100);
+            document.getElementById('goalPercentage').textContent = `${percentage}%`;
+            document.getElementById('progressBar').style.width = `${percentage}%`;
+
+            document.getElementById('statReadCount').textContent = `${readCount} книг`;
+            updateWishlistBadge();
+
+            // Total pages read calculation
+            const totalPages = booksData
+                .filter(b => readBooks.includes(b.id))
+                .reduce((acc, book) => acc + book.pages, 0);
+            document.getElementById('statTotalPages').textContent = `${totalPages} стр.`;
+        }
+
+        // BOOK DETAIL MODAL FUNCTIONS
+        function openBookModal(id) {
+            selectedBookId = id;
+            const book = booksData.find(b => b.id === id);
+            if (!book) return;
+
+            document.getElementById('modalCover').src = book.cover;
+            document.getElementById('modalTitle').textContent = book.title;
+            document.getElementById('modalAuthor').textContent = book.author;
+            document.getElementById('modalGenre').textContent = book.category;
+            document.getElementById('modalYear').textContent = `${book.year} г.`;
+            document.getElementById('modalRating').textContent = book.rating;
+            document.getElementById('modalPages').textContent = `${book.pages} стр.`;
+            document.getElementById('modalDescription').textContent = book.description;
+
+            highlightStars(0);
+            document.getElementById('userRatingLabel').textContent = 'Нажмите, чтобы оценить';
+
+            updateModalState();
+            document.getElementById('bookModal').classList.remove('hidden');
+        }
+
+        function updateModalState() {
+            if (!selectedBookId) return;
+            const isWishlisted = wishlist.includes(selectedBookId);
+            const isRead = readBooks.includes(selectedBookId);
+
+            const wishlistText = document.getElementById('modalWishlistText');
+            const wishlistBtn = document.getElementById('modalWishlistBtn');
+            if (isWishlisted) {
+                wishlistText.textContent = 'В избранном';
+                wishlistBtn.classList.add('text-warm-accent', 'border-warm-accent');
+            } else {
+                wishlistText.textContent = 'В избранное';
+                wishlistBtn.classList.remove('text-warm-accent', 'border-warm-accent');
+            }
+
+            const readText = document.getElementById('modalReadText');
+            const readBtn = document.getElementById('modalReadBtn');
+            if (isRead) {
+                readText.textContent = 'Прочитано';
+                readBtn.classList.replace('bg-warm-accent', 'bg-emerald-600');
+                readBtn.classList.replace('hover:bg-warm-accentHover', 'hover:bg-emerald-700');
+            } else {
+                readText.textContent = 'Отметить как прочитано';
+                readBtn.classList.replace('bg-emerald-600', 'bg-warm-accent');
+                readBtn.classList.replace('hover:bg-emerald-700', 'hover:bg-warm-accentHover');
+            }
+        }
+
+        function closeModal() {
+            document.getElementById('bookModal').classList.add('hidden');
+            selectedBookId = null;
+        }
+
+        function highlightStars(count) {
+            const stars = document.querySelectorAll('.star-btn');
+            stars.forEach((star, i) => {
+                if (i < count) {
+                    star.classList.add('text-amber-400');
+                    star.classList.remove('text-gray-300');
+                } else {
+                    star.classList.remove('text-amber-400');
+                    star.classList.add('text-gray-300');
+                }
+            });
+        }
+    </script>
+</body>
+</html>
